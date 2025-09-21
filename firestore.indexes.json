@@ -1,0 +1,47 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "schedules",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "attendee", "order": "ASCENDING" },
+        { "fieldPath": "evaluation_data.attendee_evaluation.status.status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "schedules",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "attendee", "order": "ASCENDING" },
+        { "fieldPath": "scheduled_date", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "schedules",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "attendee", "order": "ASCENDING" },
+        { "fieldPath": "scheduled_date", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "schedules",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "attendee_ref", "order": "ASCENDING" },
+        { "fieldPath": "scheduled_date", "order": "ASCENDING" },
+        { "fieldPath": "evaluation_data.attendee_evaluation.status.status", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "schedules",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "resident_ref", "order": "ASCENDING" },
+        { "fieldPath": "scheduled_date", "order": "ASCENDING" },
+        { "fieldPath": "evaluation_data.resident_evaluation.status.status", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

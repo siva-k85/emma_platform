@@ -1,0 +1,99 @@
+{
+  "project": {
+    "name": "EMMA - Version 1 Reboot",
+    "id": "emma---version-1-reboot",
+    "number": "365227575795",
+    "environment": "Production"
+  },
+  "webConfig": {
+    "apiKey": "AIzaSyCvFpqFcROVqhMYIyb9MldKsuTxUe2UI_I",
+    "authDomain": "emma---version-1-reboot.firebaseapp.com",
+    "projectId": "emma---version-1-reboot",
+    "storageBucket": "emma---version-1-reboot.firebasestorage.app",
+    "messagingSenderId": "365227575795",
+    "appId": "1:365227575795:web:c6fa4ff6bc190fbdf96a86",
+    "measurementId": "G-M1NH8LJSX2"
+  },
+  "fcm": {
+    "apiVersion": "v1",
+    "enabled": true,
+    "senderId": "365227575795",
+    "webPush": {
+      "vapidKeys": [
+        {
+          "publicKey": "BLm_aFdw75KK8xTJm2Axch5G8p6YXbw21_d-nAj3BeriDFjx6OpU-JuAfYYGC2qmP58aOd8NdThL2MrDPNg2k-A",
+          "dateAdded": "2025-07-21",
+          "status": "unknown"
+        },
+        {
+          "publicKey": "BOi1_5mHF6KkGOPqX_TusaiUyOHBXgXJyfM-jHfTDIxDF1zFpZ6BoZ11RB-hurIHztI5hSqRdvjUPXsdCqvEHSg",
+          "dateAdded": "2025-07-21",
+          "status": "unknown"
+        }
+      ]
+    }
+  },
+  "adminSdk": {
+    "serviceAccountEmail": "firebase-adminsdk-fbsvc@emma---version-1-reboot.iam.gserviceaccount.com"
+  },
+  "firestore": {
+    "rules": {
+      "text": "rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /{document=**} {\n      allow read, write: if false;\n    }\n  }\n}",
+      "expired": false
+    },
+    "collections": [
+      "block_time",
+      "schedules",
+      "topics",
+      "topics_cleaned",
+      "users"
+    ],
+    "indexes": [
+      {
+        "collectionGroup": "schedules",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "attendee",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "evaluation_data.attendee_evaluation.status.status",
+            "order": "ASCENDING"
+          }
+        ],
+        "density": "SPARSE_ALL"
+      },
+      {
+        "collectionGroup": "schedules",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "attendee",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "scheduled_date",
+            "order": "ASCENDING"
+          }
+        ],
+        "density": "SPARSE_ALL"
+      },
+      {
+        "collectionGroup": "schedules",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "attendee",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "scheduled_date",
+            "order": "DESCENDING"
+          }
+        ],
+        "density": "SPARSE_ALL"
+      }
+    ]
+  }
+}

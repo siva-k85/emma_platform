@@ -1,6 +1,6 @@
 # EMMA Platform (Rebuild Skeleton)
 
-This directory contains a fresh implementation scaffold of the EMMA platform backend Cloud Functions (Shift Matching + Notifications) per the provided specification.
+This directory contains a fresh implementation scaffold of the EMMA platform backend Cloud Functions (Shift Matching + Notifications) per the provided specification, plus Firebase project automation to keep the web configuration, env files, and Firestore metadata in sync.
 
 ## Structure
 - `functions/shiftadmin.js` – ShiftAdmin API integration wrapper
@@ -27,6 +27,50 @@ MEDRES_JUNIOR_ICS_URL=https://example.com/medres-junior.ics
 MEDRES_SENIOR_ICS_URL=https://example.com/medres-senior.ics
 ```
 
+## Firebase Project Setup
+Generate `.env.local` (or refresh it after any change in Firebase Console) and a canonical project metadata file:
+
+```
+./scripts/fetch_firebase_web_config.sh
+```
+
+Outputs:
+- `.env.local` – public web config + VAPID key for local development/front-end frameworks
+- `config/firebase.project.json` – snapshot of Firebase web config, FCM metadata, and Firestore indexes
+
+Ensure you are authenticated with the Firebase CLI and have access to the `emma---version-1-reboot` project before running the script.
+
+## Verification
+Confirm `.env.local`, `config/firebase.project.json`, and the live Firebase project stay aligned:
+
+```
+node scripts/verify_firebase_setup.mjs
+```
+
+This checks:
+- Web app config (API key, app ID, measurement ID, storage bucket)
+- `.env.local` values
+- Firestore indexes
+- `firestore.rules` content vs. the recorded snapshot
+
+## Schedule Backfill
+Run after deploying the updated Cloud Functions to retrofit historical schedule documents with the new snake_case schema and evaluation blocks:
+
+```
+./scripts/backfill_schedule_schema.mjs --project emma---version-1-reboot --force
+```
+
+Options:
+- `--dry-run` to preview changes
+- `--batch-size` to tune processing windows (default 400)
+
+Authenticate with `gcloud auth application-default login` or provide a service account JSON via `GOOGLE_APPLICATION_CREDENTIALS` before running.
+
+See `docs/firestore-schema.md` for the expected post-backfill shape.
+
+## Flutter Card Queries
+Implementation notes for the home evaluation cards (queries, status buckets, caching) live in `docs/flutter-home-cards.md`. Apply those patterns once the Flutter client is scaffolded to keep UI and backend in sync.
+
 ## Install & Run
 From the `functions` directory:
 ```
@@ -40,6 +84,11 @@ node test_shift_matching.js 2025-06-08 2025-06-09
 
 ## Deployment
 Ensure Firebase project initialized at repo root with `firebase.json` referencing this `functions` folder or deploy from inside the folder if configured.
+
+Deploy Firestore security rules once you are confident they reflect the desired access policy:
+```
+firebase deploy --only firestore:rules
+```
 ```
 firebase deploy --only functions
 ```

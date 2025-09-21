@@ -90,6 +90,26 @@ class ShiftMatcher {
                 auto_matched: true,
                 match_confidence: match.confidence,
                 overlap_hours: match.overlap_hours,
+                evaluation_data: {
+                    attendee_evaluation: {
+                        status: {
+                            status: 'evaluate',
+                            last_updated: admin.firestore.FieldValue.serverTimestamp()
+                        },
+                        scores: {},
+                        feedback: '',
+                        completed_at: null
+                    },
+                    resident_evaluation: {
+                        status: {
+                            status: 'evaluate',
+                            last_updated: admin.firestore.FieldValue.serverTimestamp()
+                        },
+                        scores: {},
+                        feedback: '',
+                        completed_at: null
+                    }
+                },
                 startNotificationSentToPhysician: false,
                 startNotificationSentToResident: false,
                 endNotificationSentToPhysician: false,
@@ -100,6 +120,8 @@ class ShiftMatcher {
                 attending_evaluation_completed: false,
                 assigned_topic: { category_name: 'Emergency Medicine', is_category: false, topic_title: 'General Emergency Medicine' },
                 created_at: admin.firestore.FieldValue.serverTimestamp(),
+                updated_at: admin.firestore.FieldValue.serverTimestamp(),
+                schema_version: 1,
                 test: false
             });
         }

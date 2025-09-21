@@ -62,7 +62,20 @@ async function createEvaluation({ scheduleId, evaluatorId, evaluatorType, evalua
     const evalRef = db.collection('evaluations').doc();
     batch.set(evalRef, evalDoc);
     const completionField = evaluatorType === 'resident' ? 'resident_evaluation_completed' : 'attending_evaluation_completed';
-    batch.update(scheduleRef, { [completionField]: true, updated_at: admin.firestore.FieldValue.serverTimestamp() });
+    const evalKey = evaluatorType === 'resident' ? 'resident_evaluation' : 'attendee_evaluation';
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    const scheduleUpdates = {
+        [completionField]: true,
+        updated_at: now,
+        [`evaluation_data.${evalKey}.status.status`]: 'done',
+        [`evaluation_data.${evalKey}.status.last_updated`]: now,
+        [`evaluation_data.${evalKey}.completed_at`]: now,
+        [`evaluation_data.${evalKey}.feedback`]: evaluatorType === 'resident' ? strengths || '' : additionalComments || ''
+    };
+    if (competencies) {
+        scheduleUpdates[`evaluation_data.${evalKey}.scores`] = competencies;
+    }
+    batch.update(scheduleRef, scheduleUpdates);
     await batch.commit();
     return { id: evalRef.id, ...evalDoc };
 }
