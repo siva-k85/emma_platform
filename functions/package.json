@@ -1,0 +1,25 @@
+{
+    "name": "emma-platform-functions",
+    "version": "0.1.0",
+    "private": true,
+    "engines": {
+        "node": "18"
+    },
+    "main": "index.js",
+    "license": "UNLICENSED",
+    "scripts": {
+        "lint": "eslint .",
+        "test": "node test_shift_matching.js --dry-run",
+        "serve": "firebase emulators:start --only functions",
+        "deploy": "firebase deploy --only functions"
+    },
+    "dependencies": {
+        "axios": "^1.7.2",
+        "firebase-admin": "^12.5.0",
+        "firebase-functions": "^4.9.0",
+        "node-ical": "^0.15.1"
+    },
+    "devDependencies": {
+        "eslint": "^9.9.0"
+    }
+}
