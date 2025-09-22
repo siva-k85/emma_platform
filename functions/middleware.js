@@ -66,6 +66,10 @@ function validate(callName, vars) {
             if (!vars.scheduleId || typeof vars.scheduleId !== 'string') throw new Error('scheduleId required');
             return;
         }
+        case 'approveReview': {
+            if (!vars.reviewId || typeof vars.reviewId !== 'string') throw new Error('reviewId required');
+            return;
+        }
         default:
             throw new Error(`Unknown API call: ${callName}`);
     }

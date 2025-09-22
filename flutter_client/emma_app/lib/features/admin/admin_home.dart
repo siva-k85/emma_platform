@@ -131,8 +131,8 @@ class _ReviewsTabState extends State<_ReviewsTab> {
 
   @override
   Widget build(BuildContext context) {
-    final unapprovedQuery = FirebaseFirestore.instance.collection('Evaluations').where('approved', isEqualTo: false);
-    final approvedQuery = FirebaseFirestore.instance.collection('Evaluations').where('approved', isEqualTo: true);
+    final unapprovedQuery = FirebaseFirestore.instance.collection('evaluations').where('approved', isEqualTo: false);
+    final approvedQuery = FirebaseFirestore.instance.collection('evaluations').where('approved', isEqualTo: true);
     return DefaultTabController(
       length: 2,
       child: Column(children: [

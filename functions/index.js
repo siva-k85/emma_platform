@@ -64,6 +64,18 @@ exports.api = withApiGuards(async ({ data, context, db }) => {
             const comp = await getEvaluationComparison(scheduleId);
             return { success: true, comparison: comp };
         }
+        case 'approveReview': {
+            const { reviewId } = variables;
+            if (!reviewId) throw new functions.https.HttpsError('invalid-argument', 'reviewId required');
+            // Require admin role (either legacy is_admin or role === 'admin')
+            if (!userData.is_admin && userData.role !== 'admin') {
+                throw new functions.https.HttpsError('permission-denied', 'Admin permission required');
+            }
+            const evalRef = db.collection('evaluations').doc(reviewId);
+            const now = admin.firestore.FieldValue.serverTimestamp();
+            await evalRef.set({ approved: true, approved_at: now, approved_by: context.auth.uid }, { merge: true });
+            return { success: true, id: reviewId };
+        }
         default:
             throw new functions.https.HttpsError('invalid-argument', `Unknown API call: ${callName}`);
     }
