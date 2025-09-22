@@ -15,6 +15,7 @@ import '../features/metrics/resident_metrics_screen.dart';
 import '../features/metrics/attending_metrics_screen.dart';
 import '../features/admin/admin_home.dart';
 import '../features/evaluations/evaluation_form.dart';
+import '../features/metrics/topic_metrics_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authStream = ref.watch(firebaseAuthProvider).authStateChanges();
@@ -63,6 +64,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/admin', builder: (c, s) => const AdminHome()),
       GoRoute(path: '/evaluation/:scheduleId', builder: (c, s) => EvaluationFormScreen(scheduleId: s.pathParameters['scheduleId']!)),
+      GoRoute(path: '/topic/:topicId', builder: (c, s) => TopicMetricsScreen(topicId: s.pathParameters['topicId']!)),
       // Fallback
       GoRoute(path: '/', builder: (c, s) => const AuthGate()),
     ],

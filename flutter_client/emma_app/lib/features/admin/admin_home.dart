@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class AdminHome extends StatefulWidget {
   const AdminHome({super.key});
@@ -100,14 +101,98 @@ class _SchedulesTab extends StatelessWidget {
   }
 }
 
-class _ReviewsTab extends StatelessWidget {
+class _ReviewsTab extends StatefulWidget {
   const _ReviewsTab();
   @override
+  State<_ReviewsTab> createState() => _ReviewsTabState();
+}
+
+class _ReviewsTabState extends State<_ReviewsTab> {
+  final _selection = <String>{};
+  bool _approving = false;
+
+  Future<void> _approveSelected() async {
+    setState(() => _approving = true);
+    try {
+      final callable = FirebaseFunctions.instance.httpsCallable('api');
+      for (final id in _selection) {
+        await callable.call({'callName': 'approveReview', 'variables': {'reviewId': id}});
+      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Approved selected reviews')));
+      setState(() => _selection.clear());
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Approve failed: $e')));
+    } finally {
+      if (mounted) setState(() => _approving = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(children: const [
-      SizedBox(height: 16),
-      Text('Unapproved/Approved reviews listing goes here. Hook to backend approval API.'),
-    ]);
+    final unapprovedQuery = FirebaseFirestore.instance.collection('Evaluations').where('approved', isEqualTo: false);
+    final approvedQuery = FirebaseFirestore.instance.collection('Evaluations').where('approved', isEqualTo: true);
+    return DefaultTabController(
+      length: 2,
+      child: Column(children: [
+        const TabBar(tabs: [Tab(text: 'Unapproved'), Tab(text: 'Approved')]),
+        Expanded(
+          child: TabBarView(children: [
+            Column(children: [
+              if (_selection.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: FilledButton.icon(onPressed: _approving ? null : _approveSelected, icon: const Icon(Icons.check), label: Text(_approving ? 'Approving...' : 'Approve Selected')),
+                ),
+              Expanded(
+                child: StreamBuilder(
+                  stream: unapprovedQuery.snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snap) {
+                    if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+                    final docs = snap.data!.docs;
+                    if (docs.isEmpty) return const Center(child: Text('No unapproved reviews'));
+                    return ListView.builder(
+                      itemCount: docs.length,
+                      itemBuilder: (c, i) {
+                        final d = docs[i]; final data = d.data();
+                        final checked = _selection.contains(d.id);
+                        return CheckboxListTile(
+                          value: checked,
+                          onChanged: (v) => setState(() => v == true ? _selection.add(d.id) : _selection.remove(d.id)),
+                          title: Text('Eval ${d.id} • ${data['evaluator_type'] ?? ''}'),
+                          subtitle: Text(data['additional_comments']?.toString() ?? ''),
+                          secondary: IconButton(icon: const Icon(Icons.check), onPressed: _approving ? null : () async { setState(() => _selection.add(d.id)); await _approveSelected(); }),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ]),
+            // Approved
+            StreamBuilder(
+              stream: approvedQuery.snapshots(),
+              builder: (context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snap) {
+                if (!snap.hasData) return const Center(child: CircularProgressIndicator());
+                final docs = snap.data!.docs;
+                if (docs.isEmpty) return const Center(child: Text('No approved reviews'));
+                return ListView.builder(
+                  itemCount: docs.length,
+                  itemBuilder: (c, i) {
+                    final d = docs[i]; final data = d.data();
+                    return ListTile(
+                      title: Text('Eval ${d.id} • ${data['evaluator_type'] ?? ''}'),
+                      subtitle: Text(data['additional_comments']?.toString() ?? ''),
+                    );
+                  },
+                );
+              },
+            ),
+          ]),
+        ),
+      ]),
+    );
   }
 }
 
