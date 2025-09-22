@@ -11,7 +11,17 @@ final authStateProvider = StreamProvider<fb_auth.User?>((ref) => ref.watch(fireb
 final appUserProvider = StreamProvider<AppUser?>((ref) {
   final fbUser = ref.watch(authStateProvider).value;
   if (fbUser == null) return const Stream.empty();
-  return ref.watch(usersRepoProvider).watchById(fbUser.uid);
+  final repo = ref.watch(usersRepoProvider);
+  // Watch the user doc; if missing, auto-provision a minimal one for smoother auth.
+  return repo.watchById(fbUser.uid).map((user) {
+    if (user == null) {
+      // Default role selection: if the test email is used, provision as attending; else resident.
+      final email = fbUser.email ?? '';
+      final defaultRole = email.contains('attending+dev@ahn.org') ? AppRole.attending : AppRole.resident;
+      repo.createOrUpdate(AppUser(uid: fbUser.uid, role: defaultRole, email: email));
+    }
+    return user;
+  });
 });
 
 final roleProvider = Provider<AppRole?>((ref) => ref.watch(appUserProvider).value?.role);
