@@ -4,7 +4,9 @@ const ShiftMatcher = require('./shiftMatcher');
 const { createEvaluation, getEvaluationComparison } = require('./evaluations');
 const { withApiGuards } = require('./middleware');
 
-admin.initializeApp();
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
 const db = admin.firestore();
 const messaging = admin.messaging();
 
