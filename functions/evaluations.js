@@ -1,5 +1,8 @@
 const admin = require('firebase-admin');
-
+// Ensure admin is initialized even if this module is required before index.js runs initializeApp().
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
 const db = admin.firestore();
 
 function validateRating(n, field) {
