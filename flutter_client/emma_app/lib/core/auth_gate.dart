@@ -7,11 +7,17 @@ import '../features/home/resident_home.dart';
 import '../features/home/attending_home.dart';
 import '../features/admin/admin_home.dart';
 
+const bool _bypassAuthGate = bool.fromEnvironment(
+  'BYPASS_AUTH_GATE',
+  defaultValue: false,
+);
+
 class AuthGate extends ConsumerWidget {
   const AuthGate({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (_bypassAuthGate) return const AttendingHomeShell();
     final auth = ref.watch(authStateProvider);
     return auth.when(
       loading: () => const _Splash(),
@@ -40,4 +46,3 @@ class _Splash extends StatelessWidget {
     return const Scaffold(body: Center(child: CircularProgressIndicator()));
   }
 }
-
